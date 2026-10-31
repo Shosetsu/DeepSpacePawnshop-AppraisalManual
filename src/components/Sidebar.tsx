@@ -18,8 +18,8 @@ export function Sidebar({ items, activeId, onSelect, priceOf, currency }: Props)
           <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400 ring-2 ring-slate-950" />
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-semibold tracking-wide text-white">义体估价台</p>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-300/70">Appraisal Terminal</p>
+          <p className="text-sm font-semibold tracking-wide text-white">深空当铺：鉴定手册</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-300/70">Pawnshop Appraisal Manual</p>
         </div>
       </div>
 
@@ -34,7 +34,7 @@ export function Sidebar({ items, activeId, onSelect, priceOf, currency }: Props)
                 key={item.id}
                 onClick={() => onSelect(item.id)}
                 className={cn(
-                  "group relative w-full overflow-hidden rounded-xl border px-3 py-3 text-left transition-all duration-200",
+                  "group relative w-full cursor-pointer overflow-hidden rounded-xl border px-3 py-3 text-left transition-all duration-200",
                   active
                     ? "border-cyan-400/50 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_8px_30px_-12px_rgba(34,211,238,0.6)]"
                     : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.06]",

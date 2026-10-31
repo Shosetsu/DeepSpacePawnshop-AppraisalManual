@@ -147,7 +147,7 @@ export default function App() {
               </header>
 
               {/* counterfeit alert */}
-              {result.isCounterfeit && (
+              {/* {result.isCounterfeit && (
                 <div className="mb-6 rounded-2xl border border-rose-500/40 bg-gradient-to-r from-rose-500/20 via-rose-500/10 to-transparent p-4 sm:p-5 backdrop-blur shadow-[0_8px_30px_-12px_rgba(244,63,94,0.4)]">
                   <div className="flex items-start gap-3.5">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/20 text-xl ring-1 ring-rose-500/40">
@@ -176,7 +176,7 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              )}
+              )} */}
 
               {/* checklist */}
               <div className="space-y-4">

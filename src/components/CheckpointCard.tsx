@@ -139,7 +139,7 @@ export function CheckpointCard({ index, checkpoint, value, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => updateBatch("", "")}
-                className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.08]"
+                className="cursor-pointer rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.08]"
               >
                 清除
               </button>
@@ -169,7 +169,7 @@ export function CheckpointCard({ index, checkpoint, value, onChange }: Props) {
                   type="button"
                   onClick={() => updateBatch(preset.year, preset.month)}
                   className={cn(
-                    "rounded-lg border px-2 py-1 text-[11px] transition-colors",
+                    "cursor-pointer rounded-lg border px-2 py-1 text-[11px] transition-colors",
                     active
                       ? "border-cyan-400/60 bg-cyan-400/20 text-cyan-200"
                       : "border-white/10 bg-white/[0.02] text-slate-400 hover:border-white/20 hover:text-slate-200",
@@ -267,7 +267,7 @@ export function CheckpointCard({ index, checkpoint, value, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => setFactoryCode("")}
-                className="rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.08]"
+                className="cursor-pointer rounded-lg border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs text-slate-400 hover:bg-white/[0.08]"
               >
                 清除
               </button>
@@ -297,7 +297,7 @@ export function CheckpointCard({ index, checkpoint, value, onChange }: Props) {
                   type="button"
                   onClick={() => setFactoryCode(code)}
                   className={cn(
-                    "rounded-lg border px-2 py-0.5 font-mono text-xs transition-colors",
+                    "cursor-pointer rounded-lg border px-2 py-0.5 font-mono text-xs transition-colors",
                     rawVal.padStart(2, "0") === code
                       ? "border-emerald-400/60 bg-emerald-400/20 text-emerald-200"
                       : "border-white/10 bg-white/[0.02] text-slate-400 hover:border-emerald-400/30 hover:text-emerald-300",
@@ -315,7 +315,7 @@ export function CheckpointCard({ index, checkpoint, value, onChange }: Props) {
                   type="button"
                   onClick={() => setFactoryCode(code)}
                   className={cn(
-                    "rounded-lg border px-2 py-0.5 font-mono text-xs transition-colors",
+                    "cursor-pointer rounded-lg border px-2 py-0.5 font-mono text-xs transition-colors",
                     rawVal.padStart(2, "0") === code
                       ? "border-rose-400/60 bg-rose-400/20 text-rose-200"
                       : "border-white/10 bg-white/[0.02] text-slate-400 hover:border-rose-400/30 hover:text-rose-300",
@@ -328,7 +328,7 @@ export function CheckpointCard({ index, checkpoint, value, onChange }: Props) {
                 type="button"
                 onClick={() => setFactoryCode("99")}
                 className={cn(
-                  "rounded-lg border px-2 py-0.5 font-mono text-xs transition-colors",
+                  "cursor-pointer rounded-lg border px-2 py-0.5 font-mono text-xs transition-colors",
                   rawVal.padStart(2, "0") === "99"
                     ? "border-rose-500/60 bg-rose-500/20 text-rose-200"
                     : "border-dashed border-rose-500/30 bg-rose-500/5 text-rose-300/70 hover:border-rose-500/50",
@@ -412,7 +412,7 @@ export function CheckpointCard({ index, checkpoint, value, onChange }: Props) {
               key={option.id}
               onClick={() => onChange(checkpoint.id, option.id)}
               className={cn(
-                "group relative overflow-hidden rounded-xl border px-3 py-2.5 text-left transition-all duration-200 active:scale-[0.98]",
+                "group relative cursor-pointer overflow-hidden rounded-xl border px-3 py-2.5 text-left transition-all duration-200 active:scale-[0.98]",
                 active
                   ? "border-cyan-400/60 bg-gradient-to-br from-cyan-400/15 to-blue-500/5 shadow-[0_8px_24px_-12px_rgba(34,211,238,0.8)]"
                   : "border-white/10 bg-white/[0.02] hover:border-white/25 hover:bg-white/[0.06]",

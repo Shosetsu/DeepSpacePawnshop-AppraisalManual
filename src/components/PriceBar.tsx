@@ -110,7 +110,7 @@ export function PriceBar({ item, result, onReset, dirty }: Props) {
             className={cn(
               "group flex items-center gap-2 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all",
               dirty
-                ? "border-white/15 bg-white/5 text-slate-200 hover:border-rose-400/50 hover:bg-rose-400/10 hover:text-rose-200 active:scale-95"
+                ? "cursor-pointer border-white/15 bg-white/5 text-slate-200 hover:border-rose-400/50 hover:bg-rose-400/10 hover:text-rose-200 active:scale-95"
                 : "cursor-not-allowed border-white/5 bg-white/[0.02] text-slate-600",
             )}
           >
