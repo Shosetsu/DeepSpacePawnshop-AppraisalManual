@@ -9,12 +9,16 @@ export type AppraisalOption = {
   note?: string;
 };
 
+export type CheckpointType = "options" | "batch" | "factory";
+
 export type Checkpoint = {
   id: string;
   label: string;
   caption: string;
   icon: string;
+  type?: CheckpointType;
   multiple?: boolean;
+  optional?: boolean;
   options: AppraisalOption[];
 };
 
@@ -132,7 +136,80 @@ export const tacticalGloves: AppraisalItem = {
   ],
 };
 
-export const items: AppraisalItem[] = [tacticalGloves];
+export const ribwich: AppraisalItem = {
+  id: "ribwich",
+  name: "肋明治",
+  category: "食品 / 传说级快餐",
+  icon: "🥪",
+  tagline: "风靡全城的传说级合成肉排三明治，严格通过生产批次、包装工厂、配料与防伪标识核定真伪。",
+  basePrice: 150,
+  floorPrice: 40,
+  currency: "¢",
+  checkpoints: [
+    {
+      id: "batch",
+      type: "batch",
+      label: "生产批次",
+      caption: "输入生产年/月（如 425年1月、438年12月）",
+      icon: "📅",
+      options: [],
+    },
+    {
+      id: "factory",
+      type: "factory",
+      label: "包装工厂",
+      caption: "输入两位数工厂代码（如 01、07、21 等）",
+      icon: "🏭",
+      options: [],
+    },
+    {
+      id: "ingredients",
+      label: "豪华配料",
+      caption: "核验加料（可选，芝麻面包与酸黄瓜须成对出现）",
+      icon: "🥩",
+      multiple: true,
+      optional: true,
+      options: [
+        { id: "patty2", label: "两块肉饼", delta: 800, note: "肉量翻倍" },
+        { id: "sesame", label: "芝麻面包", delta: 0, note: "须与酸黄瓜同时拥有" },
+        { id: "pickle", label: "酸黄瓜", delta: 0, note: "须与芝麻面包同时拥有" },
+      ],
+    },
+    {
+      id: "da_logo",
+      label: "防伪DA标识",
+      caption: "外包装特制全息DA防伪印记",
+      icon: "🛡️",
+      options: [
+        { id: "valid", label: "正确标志", delta: 0, note: "官方正品防伪" },
+        { id: "invalid", label: "无或错误标志", delta: 0, note: "强制保底" },
+      ],
+    },
+    {
+      id: "ribwich_logo",
+      label: "Ribwich标识",
+      caption: "第一批次无标识，第二批次必须印有标识",
+      icon: "🏷️",
+      options: [
+        { id: "has", label: "有标识", delta: 0, note: "印有专属Ribwich徽标" },
+        { id: "none", label: "无标识", delta: 0, note: "未印专属徽标" },
+      ],
+    },
+  ],
+  bonuses: [
+    {
+      id: "sesame-pickle-set",
+      label: "经典佐料搭配",
+      formula: "同时拥有芝麻面包和酸黄瓜",
+      bonus: 300,
+      requires: {
+        ingredients: { all: ["sesame", "pickle"] },
+      },
+    },
+  ],
+};
+
+export const items: AppraisalItem[] = [tacticalGloves, ribwich];
 
 export const upcomingItems = [
   { id: "visor", name: "战术目镜", icon: "🥽", category: "头部 / 光学" },

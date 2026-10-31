@@ -66,11 +66,15 @@ export function PriceBar({ item, result, onReset, dirty }: Props) {
           <div className="text-right">
             <div className="flex items-center justify-end gap-2">
               <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">最终估价</p>
-              {result.isFloored && (
+              {result.isCounterfeit ? (
+                <span className="rounded bg-rose-500/20 px-1.5 py-px text-[10px] font-semibold text-rose-300 ring-1 ring-rose-500/30">
+                  ⚠️ 赝品保底
+                </span>
+              ) : result.isFloored ? (
                 <span className="rounded bg-amber-400/15 px-1.5 py-px text-[10px] font-medium text-amber-300">
                   保底价
                 </span>
-              )}
+              ) : null}
             </div>
             <div className="flex items-baseline justify-end gap-2">
               {result.isFloored && (
@@ -82,9 +86,11 @@ export function PriceBar({ item, result, onReset, dirty }: Props) {
               <span
                 className={cn(
                   "bg-gradient-to-br bg-clip-text font-mono text-4xl font-bold tabular-nums text-transparent sm:text-5xl",
-                  result.isFloored
-                    ? "from-amber-200 to-amber-400"
-                    : "from-white via-cyan-100 to-cyan-300",
+                  result.isCounterfeit
+                    ? "from-rose-300 via-rose-400 to-amber-300"
+                    : result.isFloored
+                      ? "from-amber-200 to-amber-400"
+                      : "from-white via-cyan-100 to-cyan-300",
                 )}
               >
                 {item.currency}

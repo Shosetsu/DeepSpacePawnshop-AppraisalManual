@@ -21,7 +21,13 @@ export default function App() {
       const current = prev[activeItem.id] ?? {};
       const next: Selection = { ...current };
 
-      if (checkpoint?.multiple) {
+      if (checkpoint?.type === "batch" || checkpoint?.type === "factory") {
+        if (!optionId || optionId.trim() === "") {
+          delete next[checkpointId];
+        } else {
+          next[checkpointId] = optionId.trim();
+        }
+      } else if (checkpoint?.multiple) {
         const currentVal = current[checkpointId];
         const currentList: string[] = Array.isArray(currentVal)
           ? currentVal
@@ -140,6 +146,38 @@ export default function App() {
                 </div>
               </header>
 
+              {/* counterfeit alert */}
+              {result.isCounterfeit && (
+                <div className="mb-6 rounded-2xl border border-rose-500/40 bg-gradient-to-r from-rose-500/20 via-rose-500/10 to-transparent p-4 sm:p-5 backdrop-blur shadow-[0_8px_30px_-12px_rgba(244,63,94,0.4)]">
+                  <div className="flex items-start gap-3.5">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-500/20 text-xl ring-1 ring-rose-500/40">
+                      ⚠️
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base font-bold text-rose-200">
+                          鉴定结论：判定为赝品
+                        </h3>
+                        <span className="rounded-full border border-rose-500/40 bg-rose-500/20 px-2 py-0.5 font-mono text-xs font-semibold text-rose-300">
+                          强制保底价 {activeItem.currency}{activeItem.floorPrice}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-rose-200/70">
+                        该物品未通过原厂防伪或规格核验，已被系统强制执行最低保底估价：
+                      </p>
+                      <ul className="mt-2 space-y-1 text-xs text-rose-200/90">
+                        {result.counterfeitReasons.map((reason, i) => (
+                          <li key={i} className="flex items-start gap-1.5">
+                            <span className="text-rose-400 font-bold">•</span>
+                            <span>{reason}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* checklist */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3 px-1">
@@ -147,7 +185,11 @@ export default function App() {
                     估价检查清单
                   </h2>
                   <div className="h-px flex-1 bg-gradient-to-r from-white/15 to-transparent" />
-                  <span className="text-[11px] text-slate-600">点击已选项可取消选择</span>
+                  <span className="text-[11px] text-slate-600">
+                    {activeItem.id === "ribwich"
+                      ? "支持输入框输入与选项切换 · 赝品直接强制最低价"
+                      : "点击已选项可取消选择 · 配件支持多选"}
+                  </span>
                 </div>
 
                 {activeItem.checkpoints.map((checkpoint, index) => (
