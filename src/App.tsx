@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { items, type Selection } from "./data/items";
+import { items, CheckpointType, type Selection } from "./data/items";
 import { appraise, hasSelectedOption } from "./lib/appraise";
 import { Sidebar } from "./components/Sidebar";
 import { CheckpointCard } from "./components/CheckpointCard";
@@ -13,15 +13,23 @@ export default function App() {
   const activeItem = items.find((i) => i.id === activeId) ?? items[0];
   const selection = selections[activeItem.id] ?? {};
 
-  const result = useMemo(() => appraise(activeItem, selection), [activeItem, selection]);
+  const result = useMemo(
+    () => appraise(activeItem, selection),
+    [activeItem, selection],
+  );
 
   const handleChange = (checkpointId: string, optionId: string) => {
-    const checkpoint = activeItem.checkpoints.find((c) => c.id === checkpointId);
+    const checkpoint = activeItem.checkpoints.find(
+      (c) => c.id === checkpointId,
+    );
     setSelections((prev) => {
       const current = prev[activeItem.id] ?? {};
       const next: Selection = { ...current };
 
-      if (checkpoint?.type === "batch" || checkpoint?.type === "factory") {
+      if (
+        checkpoint?.type === CheckpointType.Batch ||
+        checkpoint?.type === CheckpointType.Factory
+      ) {
         if (!optionId || optionId.trim() === "") {
           delete next[checkpointId];
         } else {
@@ -117,7 +125,9 @@ export default function App() {
                     </div>
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <h1 className="text-2xl font-bold tracking-tight text-white">{activeItem.name}</h1>
+                        <h1 className="text-2xl font-bold tracking-tight text-white">
+                          {activeItem.name}
+                        </h1>
                         <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 text-[11px] text-cyan-300">
                           {activeItem.category}
                         </span>
@@ -129,14 +139,18 @@ export default function App() {
                   </div>
                   <div className="flex gap-2">
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-slate-500">基础价</p>
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500">
+                        基础价
+                      </p>
                       <p className="font-mono text-lg font-semibold text-slate-100 tabular-nums">
                         {activeItem.currency}
                         {activeItem.basePrice}
                       </p>
                     </div>
                     <div className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-center">
-                      <p className="text-[10px] uppercase tracking-wider text-slate-500">最低价</p>
+                      <p className="text-[10px] uppercase tracking-wider text-slate-500">
+                        最低价
+                      </p>
                       <p className="font-mono text-lg font-semibold text-amber-300 tabular-nums">
                         {activeItem.currency}
                         {activeItem.floorPrice}
@@ -202,17 +216,26 @@ export default function App() {
                   />
                 ))}
 
-                <BonusPanel bonuses={activeItem.bonuses} state={result.bonusState} />
+                <BonusPanel
+                  bonuses={activeItem.bonuses}
+                  state={result.bonusState}
+                />
               </div>
 
               <p className="mt-6 pb-2 text-center text-[11px] text-slate-600">
-                估价公式：基础价 + 各检查点加减项 + 套装加成，结果不低于最低价 {activeItem.currency}
+                估价公式：基础价 + 各检查点加减项 + 套装加成，结果不低于最低价{" "}
+                {activeItem.currency}
                 {activeItem.floorPrice}。
               </p>
             </div>
           </div>
 
-          <PriceBar item={activeItem} result={result} onReset={handleReset} dirty={dirty} />
+          <PriceBar
+            item={activeItem}
+            result={result}
+            onReset={handleReset}
+            dirty={dirty}
+          />
         </main>
       </div>
     </div>

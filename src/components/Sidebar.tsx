@@ -1,5 +1,5 @@
 import { cn } from "../utils/cn";
-import { upcomingItems, type AppraisalItem } from "../data/items";
+import type { AppraisalItem } from "../data/items";
 
 type Props = {
   items: AppraisalItem[];
@@ -9,7 +9,13 @@ type Props = {
   currency: string;
 };
 
-export function Sidebar({ items, activeId, onSelect, priceOf, currency }: Props) {
+export function Sidebar({
+  items,
+  activeId,
+  onSelect,
+  priceOf,
+  currency,
+}: Props) {
   return (
     <aside className="flex w-full shrink-0 flex-col gap-6 border-b border-white/10 bg-slate-950/60 p-5 backdrop-blur-xl lg:h-screen lg:w-72 lg:border-b-0 lg:border-r">
       <div className="flex items-center gap-3">
@@ -18,13 +24,19 @@ export function Sidebar({ items, activeId, onSelect, priceOf, currency }: Props)
           <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400 ring-2 ring-slate-950" />
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-semibold tracking-wide text-white">深空当铺：鉴定手册</p>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-300/70">Pawnshop Appraisal Manual</p>
+          <p className="text-sm font-semibold tracking-wide text-white">
+            深空当铺：鉴定手册
+          </p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-300/70">
+            Pawnshop Appraisal Manual
+          </p>
         </div>
       </div>
 
       <div className="space-y-2">
-        <p className="px-1 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">可估价商品</p>
+        <p className="px-1 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-500">
+          可估价商品
+        </p>
         <nav className="space-y-2">
           {items.map((item) => {
             const active = item.id === activeId;
@@ -48,16 +60,25 @@ export function Sidebar({ items, activeId, onSelect, priceOf, currency }: Props)
                     {item.icon}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className={cn("truncate text-sm font-medium", active ? "text-white" : "text-slate-200")}>
+                    <p
+                      className={cn(
+                        "truncate text-sm font-medium",
+                        active ? "text-white" : "text-slate-200",
+                      )}
+                    >
                       {item.name}
                     </p>
-                    <p className="truncate text-[11px] text-slate-500">{item.category}</p>
+                    <p className="truncate text-[11px] text-slate-500">
+                      {item.category}
+                    </p>
                   </div>
                   {price !== null && (
                     <span
                       className={cn(
                         "rounded-md px-1.5 py-0.5 font-mono text-[11px] tabular-nums",
-                        active ? "bg-cyan-400/15 text-cyan-200" : "bg-white/5 text-slate-400",
+                        active
+                          ? "bg-cyan-400/15 text-cyan-200"
+                          : "bg-white/5 text-slate-400",
                       )}
                     >
                       {currency}
@@ -69,26 +90,6 @@ export function Sidebar({ items, activeId, onSelect, priceOf, currency }: Props)
             );
           })}
         </nav>
-      </div>
-
-      <div className="space-y-2">
-        <p className="px-1 text-[11px] font-medium uppercase tracking-[0.2em] text-slate-600">即将上线</p>
-        <div className="space-y-2 opacity-50">
-          {upcomingItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex cursor-not-allowed items-center gap-3 rounded-xl border border-dashed border-white/10 px-3 py-2.5"
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-base grayscale">
-                {item.icon}
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-[13px] text-slate-400">{item.name}</p>
-                <p className="truncate text-[10px] text-slate-600">{item.category}</p>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="mt-auto hidden rounded-xl border border-white/10 bg-white/[0.03] p-3 lg:block">

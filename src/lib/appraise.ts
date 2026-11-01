@@ -1,4 +1,9 @@
-import type { AppraisalItem, BonusRule, Selection } from "../data/items";
+import {
+  CheckpointType,
+  type AppraisalItem,
+  type BonusRule,
+  type Selection,
+} from "../data/items";
 
 export type LineItem = {
   key: string;
@@ -256,16 +261,18 @@ export function appraise(item: AppraisalItem, selection: Selection): AppraisalRe
     if (ingredientVal) {
       const pickedIds = Array.isArray(ingredientVal) ? ingredientVal : [ingredientVal];
       const checkpoint = item.checkpoints.find((c) => c.id === "ingredients");
-      for (const id of pickedIds) {
-        const option = checkpoint?.options.find((o) => o.id === id);
-        if (!option) continue;
-        optionTotal += option.delta;
-        lines.push({
-          key: `ingredients-${option.id}`,
-          label: "豪华配料",
-          detail: option.label,
-          amount: option.delta,
-        });
+      if (checkpoint && "options" in checkpoint) {
+        for (const id of pickedIds) {
+          const option = checkpoint.options.find((o) => o.id === id);
+          if (!option) continue;
+          optionTotal += option.delta;
+          lines.push({
+            key: `ingredients-${option.id}`,
+            label: "豪华配料",
+            detail: option.label,
+            amount: option.delta,
+          });
+        }
       }
 
       const hasSesame = pickedIds.includes("sesame");
@@ -352,6 +359,13 @@ export function appraise(item: AppraisalItem, selection: Selection): AppraisalRe
   } else {
     // 通用检查点计价
     for (const checkpoint of item.checkpoints) {
+      if (
+        checkpoint.type === CheckpointType.Batch ||
+        checkpoint.type === CheckpointType.Factory
+      ) {
+        continue;
+      }
+
       const picked = selection[checkpoint.id];
       if (!picked) continue;
 
@@ -393,7 +407,9 @@ export function appraise(item: AppraisalItem, selection: Selection): AppraisalRe
   const rawTotal = item.basePrice + optionTotal + bonusTotal;
   const finalPrice = isCounterfeit ? item.floorPrice : Math.max(item.floorPrice, rawTotal);
 
-  const nonOptionalCheckpoints = item.checkpoints.filter((c) => !c.optional);
+  const nonOptionalCheckpoints = item.checkpoints.filter(
+    (c) => !("optional" in c && c.optional),
+  );
   const selectedCount = item.checkpoints.filter((c) => hasSelectedOption(selection[c.id])).length;
   const isComplete = nonOptionalCheckpoints.every((c) => hasSelectedOption(selection[c.id]));
 
