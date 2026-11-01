@@ -121,7 +121,9 @@ export function FactoryCheckpointCard({
                   ? "border border-rose-500/30 bg-rose-500/10 text-rose-300"
                   : factoryEval.delta > 0
                     ? "border border-emerald-400/30 bg-emerald-400/10 text-emerald-300"
-                    : "border border-rose-400/30 bg-rose-400/10 text-rose-300",
+                    : factoryEval.delta === 0
+                      ? "border border-cyan-400/30 bg-cyan-400/10 text-cyan-300"
+                      : "border border-rose-400/30 bg-rose-400/10 text-rose-300",
               )}
             >
               {factoryEval.detail}
@@ -167,17 +169,20 @@ export function FactoryCheckpointCard({
                 {code}
               </button>
             ))}
+          </div>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-[11px] text-cyan-400/80">普通品质 (0)：</span>
             <button
               type="button"
               onClick={() => setFactoryCode("99")}
               className={cn(
                 "cursor-pointer rounded-lg border px-2 py-0.5 font-mono text-xs transition-colors",
                 rawVal.padStart(2, "0") === "99"
-                  ? "border-rose-500/60 bg-rose-500/20 text-rose-200"
-                  : "border-dashed border-rose-500/30 bg-rose-500/5 text-rose-300/70 hover:border-rose-500/50",
+                  ? "border-cyan-500/60 bg-cyan-500/20 text-cyan-200"
+                  : "border-dashed border-cyan-500/30 bg-cyan-500/5 text-cyan-300/70 hover:border-cyan-500/50",
               )}
             >
-              99 (赝品测试)
+              99 (其他工厂)
             </button>
           </div>
         </div>

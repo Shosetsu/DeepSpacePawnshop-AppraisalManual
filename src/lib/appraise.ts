@@ -3,7 +3,7 @@ import {
   type AppraisalItem,
   type BonusRule,
   type Selection,
-} from "../data/items";
+} from '../data/items';
 
 export type LineItem = {
   key: string;
@@ -29,21 +29,21 @@ export type AppraisalResult = {
   isComplete: boolean;
 };
 
-export const HIGH_QUALITY_FACTORIES = ["01", "02", "05", "08", "21", "34"];
-export const LOW_QUALITY_FACTORIES = ["07", "15", "18", "26", "31"];
+export const HIGH_QUALITY_FACTORIES = ['01', '02', '05', '08', '21', '34'];
+export const LOW_QUALITY_FACTORIES = ['07', '15', '18', '26', '31'];
 
 export type BatchEvaluation = {
   isFilled: boolean;
   isValid: boolean;
   isCounterfeit: boolean;
-  batchType?: "batch1" | "batch2";
+  batchType?: 'batch1' | 'batch2';
   delta: number;
   detail: string;
   reason?: string;
 };
 
 export function parseBatch(raw?: unknown): { year?: number; month?: number } {
-  if (typeof raw !== "string" || !raw.trim()) return {};
+  if (typeof raw !== 'string' || !raw.trim()) return {};
   const cleaned = raw.trim();
   const match = cleaned.match(/^(\d{1,4})[^\d]+(\d{1,2})/);
   if (match) {
@@ -53,8 +53,14 @@ export function parseBatch(raw?: unknown): { year?: number; month?: number } {
 }
 
 export function evaluateRibwichBatch(raw?: unknown): BatchEvaluation {
-  if (typeof raw !== "string" || !raw.trim()) {
-    return { isFilled: false, isValid: false, isCounterfeit: false, delta: 0, detail: "未输入" };
+  if (typeof raw !== 'string' || !raw.trim()) {
+    return {
+      isFilled: false,
+      isValid: false,
+      isCounterfeit: false,
+      delta: 0,
+      detail: '未输入',
+    };
   }
   const { year, month } = parseBatch(raw);
   if (year === undefined || month === undefined || month < 1 || month > 12) {
@@ -64,7 +70,7 @@ export function evaluateRibwichBatch(raw?: unknown): BatchEvaluation {
       isCounterfeit: true,
       delta: 0,
       detail: `${raw}（格式无效）`,
-      reason: "生产批次格式不规范或月份无效（判定为赝品）",
+      reason: '生产批次格式不规范或月份无效（判定为赝品）',
     };
   }
 
@@ -74,9 +80,9 @@ export function evaluateRibwichBatch(raw?: unknown): BatchEvaluation {
       isFilled: true,
       isValid: true,
       isCounterfeit: false,
-      batchType: "batch1",
+      batchType: 'batch1',
       delta: 130,
-      detail: "第一批（首月：425年1月）",
+      detail: '第一批（首月：425年1月）',
     };
   }
 
@@ -91,7 +97,7 @@ export function evaluateRibwichBatch(raw?: unknown): BatchEvaluation {
       isFilled: true,
       isValid: true,
       isCounterfeit: false,
-      batchType: "batch1",
+      batchType: 'batch1',
       delta: 80,
       detail: `第一批（${year}年${month}月）`,
     };
@@ -103,9 +109,9 @@ export function evaluateRibwichBatch(raw?: unknown): BatchEvaluation {
       isFilled: true,
       isValid: true,
       isCounterfeit: false,
-      batchType: "batch2",
+      batchType: 'batch2',
       delta: 50,
-      detail: "第二批（末月：438年12月）",
+      detail: '第二批（末月：438年12月）',
     };
   }
 
@@ -120,7 +126,7 @@ export function evaluateRibwichBatch(raw?: unknown): BatchEvaluation {
       isFilled: true,
       isValid: true,
       isCounterfeit: false,
-      batchType: "batch2",
+      batchType: 'batch2',
       delta: 0,
       detail: `第二批（${year}年${month}月）`,
     };
@@ -147,10 +153,16 @@ export type FactoryEvaluation = {
 };
 
 export function evaluateRibwichFactory(raw?: unknown): FactoryEvaluation {
-  if (typeof raw !== "string" || !raw.trim()) {
-    return { isFilled: false, isValid: false, isCounterfeit: false, delta: 0, detail: "未输入" };
+  if (typeof raw !== 'string' || !raw.trim()) {
+    return {
+      isFilled: false,
+      isValid: false,
+      isCounterfeit: false,
+      delta: 0,
+      detail: '未输入',
+    };
   }
-  const code = raw.trim().padStart(2, "0");
+  const code = raw.trim().padStart(2, '0');
   if (HIGH_QUALITY_FACTORIES.includes(code)) {
     return {
       isFilled: true,
@@ -172,17 +184,16 @@ export function evaluateRibwichFactory(raw?: unknown): FactoryEvaluation {
   return {
     isFilled: true,
     isValid: true,
-    isCounterfeit: true,
+    isCounterfeit: false,
     delta: 0,
-    detail: `未授权工厂 [${code}]`,
-    reason: `工厂代码 [${code}] 未获官方品质认证，判定为赝品`,
+    detail: `一般工厂 [${code}]`,
   };
 }
 
 export function hasSelectedOption(val: unknown): boolean {
   if (!val) return false;
   if (Array.isArray(val)) return val.length > 0;
-  return typeof val === "string" && val.length > 0;
+  return typeof val === 'string' && val.length > 0;
 }
 
 export function isBonusMatched(rule: BonusRule, selection: Selection): boolean {
@@ -209,7 +220,9 @@ export function isBonusMatched(rule: BonusRule, selection: Selection): boolean {
 
     if (condition.exact && condition.exact.length > 0) {
       if (pickedList.length !== condition.exact.length) return false;
-      const matchesExact = condition.exact.every((req) => pickedList.includes(req));
+      const matchesExact = condition.exact.every((req) =>
+        pickedList.includes(req),
+      );
       if (!matchesExact) return false;
     }
 
@@ -217,21 +230,24 @@ export function isBonusMatched(rule: BonusRule, selection: Selection): boolean {
   });
 }
 
-export function appraise(item: AppraisalItem, selection: Selection): AppraisalResult {
+export function appraise(
+  item: AppraisalItem,
+  selection: Selection,
+): AppraisalResult {
   const lines: LineItem[] = [];
   let optionTotal = 0;
   const counterfeitReasons: string[] = [];
 
   // 特殊对象判断：肋明治 (ribwich)
-  if (item.id === "ribwich") {
+  if (item.id === 'ribwich') {
     // 1. 生产批次
-    const batchVal = selection["batch"];
+    const batchVal = selection['batch'];
     const batchEval = evaluateRibwichBatch(batchVal);
     if (batchEval.isFilled) {
       optionTotal += batchEval.delta;
       lines.push({
-        key: "batch",
-        label: "生产批次",
+        key: 'batch',
+        label: '生产批次',
         detail: batchEval.detail,
         amount: batchEval.delta,
       });
@@ -241,13 +257,13 @@ export function appraise(item: AppraisalItem, selection: Selection): AppraisalRe
     }
 
     // 2. 包装工厂
-    const factoryVal = selection["factory"];
+    const factoryVal = selection['factory'];
     const factoryEval = evaluateRibwichFactory(factoryVal);
     if (factoryEval.isFilled) {
       optionTotal += factoryEval.delta;
       lines.push({
-        key: "factory",
-        label: "包装工厂",
+        key: 'factory',
+        label: '包装工厂',
         detail: factoryEval.detail,
         amount: factoryEval.delta,
       });
@@ -257,102 +273,114 @@ export function appraise(item: AppraisalItem, selection: Selection): AppraisalRe
     }
 
     // 3. 豪华配料
-    const ingredientVal = selection["ingredients"];
+    const ingredientVal = selection['ingredients'];
     if (ingredientVal) {
-      const pickedIds = Array.isArray(ingredientVal) ? ingredientVal : [ingredientVal];
-      const checkpoint = item.checkpoints.find((c) => c.id === "ingredients");
-      if (checkpoint && "options" in checkpoint) {
+      const pickedIds = Array.isArray(ingredientVal)
+        ? ingredientVal
+        : [ingredientVal];
+      const checkpoint = item.checkpoints.find((c) => c.id === 'ingredients');
+      if (checkpoint && 'options' in checkpoint) {
         for (const id of pickedIds) {
           const option = checkpoint.options.find((o) => o.id === id);
           if (!option) continue;
           optionTotal += option.delta;
           lines.push({
             key: `ingredients-${option.id}`,
-            label: "豪华配料",
+            label: '豪华配料',
             detail: option.label,
             amount: option.delta,
           });
         }
       }
 
-      const hasSesame = pickedIds.includes("sesame");
-      const hasPickle = pickedIds.includes("pickle");
+      const hasSesame = pickedIds.includes('sesame');
+      const hasPickle = pickedIds.includes('pickle');
       if (hasSesame && !hasPickle) {
-        counterfeitReasons.push("配料仅有芝麻面包而无酸黄瓜，不符合原厂配方（判定为赝品）");
+        counterfeitReasons.push(
+          '配料仅有芝麻面包而无酸黄瓜，不符合原厂配方（判定为赝品）',
+        );
       } else if (!hasSesame && hasPickle) {
-        counterfeitReasons.push("配料仅有酸黄瓜而无芝麻面包，不符合原厂配方（判定为赝品）");
+        counterfeitReasons.push(
+          '配料仅有酸黄瓜而无芝麻面包，不符合原厂配方（判定为赝品）',
+        );
       }
     }
 
     // 4. 防伪DA标识
-    const daLogoVal = selection["da_logo"];
+    const daLogoVal = selection['da_logo'];
     if (daLogoVal) {
-      if (daLogoVal === "invalid") {
-        counterfeitReasons.push("防伪DA标识缺失或错误，判定为赝品");
+      if (daLogoVal === 'invalid') {
+        counterfeitReasons.push('防伪DA标识缺失或错误，判定为赝品');
         lines.push({
-          key: "da_logo",
-          label: "防伪DA标识",
-          detail: "无或错误标志",
+          key: 'da_logo',
+          label: '防伪DA标识',
+          detail: '无或错误标志',
           amount: 0,
         });
-      } else if (daLogoVal === "valid") {
+      } else if (daLogoVal === 'valid') {
         lines.push({
-          key: "da_logo",
-          label: "防伪DA标识",
-          detail: "官方正品标志",
+          key: 'da_logo',
+          label: '防伪DA标识',
+          detail: '官方正品标志',
           amount: 0,
         });
       }
     }
 
     // 5. Ribwich标识
-    const ribwichLogoVal = selection["ribwich_logo"];
+    const ribwichLogoVal = selection['ribwich_logo'];
     if (ribwichLogoVal) {
       if (batchEval.isFilled && batchEval.isValid && !batchEval.isCounterfeit) {
-        if (batchEval.batchType === "batch1") {
-          if (ribwichLogoVal === "none") {
+        if (batchEval.batchType === 'batch1') {
+          if (ribwichLogoVal === 'none') {
             lines.push({
-              key: "ribwich_logo",
-              label: "Ribwich标识",
-              detail: "第一批无标识（核验通过）",
+              key: 'ribwich_logo',
+              label: 'Ribwich标识',
+              detail: '第一批无标识（核验通过）',
               amount: 0,
             });
           } else {
-            counterfeitReasons.push("第一批次包装不应印有Ribwich标识（判定为加贴赝品）");
+            counterfeitReasons.push(
+              '第一批次包装不应印有Ribwich标识（判定为加贴赝品）',
+            );
             lines.push({
-              key: "ribwich_logo",
-              label: "Ribwich标识",
-              detail: "异常有标识",
+              key: 'ribwich_logo',
+              label: 'Ribwich标识',
+              detail: '异常有标识',
               amount: 0,
             });
           }
-        } else if (batchEval.batchType === "batch2") {
-          if (ribwichLogoVal === "has") {
+        } else if (batchEval.batchType === 'batch2') {
+          if (ribwichLogoVal === 'has') {
             lines.push({
-              key: "ribwich_logo",
-              label: "Ribwich标识",
-              detail: "第二批印有标识（核验通过）",
+              key: 'ribwich_logo',
+              label: 'Ribwich标识',
+              detail: '第二批印有标识（核验通过）',
               amount: 0,
             });
           } else {
-            counterfeitReasons.push("第二批次包装必须印有Ribwich标识（缺失标识为赝品）");
+            counterfeitReasons.push(
+              '第二批次包装必须印有Ribwich标识（缺失标识为赝品）',
+            );
             lines.push({
-              key: "ribwich_logo",
-              label: "Ribwich标识",
-              detail: "异常缺失标识",
+              key: 'ribwich_logo',
+              label: 'Ribwich标识',
+              detail: '异常缺失标识',
               amount: 0,
             });
           }
         }
       } else {
         lines.push({
-          key: "ribwich_logo",
-          label: "Ribwich标识",
-          detail: ribwichLogoVal === "has" ? "有标识" : "无标识",
+          key: 'ribwich_logo',
+          label: 'Ribwich标识',
+          detail: ribwichLogoVal === 'has' ? '有标识' : '无标识',
           amount: 0,
         });
         if (batchEval.isFilled && batchEval.isCounterfeit) {
-          counterfeitReasons.push("批次非正规，标识无法与批次对应（判定为赝品）");
+          counterfeitReasons.push(
+            '批次非正规，标识无法与批次对应（判定为赝品）',
+          );
         }
       }
     }
@@ -396,7 +424,7 @@ export function appraise(item: AppraisalItem, selection: Selection): AppraisalRe
       bonusTotal += rule.bonus;
       lines.push({
         key: `bonus-${rule.id}`,
-        label: "套装加成",
+        label: '套装加成',
         detail: rule.label,
         amount: rule.bonus,
       });
@@ -405,13 +433,19 @@ export function appraise(item: AppraisalItem, selection: Selection): AppraisalRe
 
   const isCounterfeit = counterfeitReasons.length > 0;
   const rawTotal = item.basePrice + optionTotal + bonusTotal;
-  const finalPrice = isCounterfeit ? item.floorPrice : Math.max(item.floorPrice, rawTotal);
+  const finalPrice = isCounterfeit
+    ? item.floorPrice
+    : Math.max(item.floorPrice, rawTotal);
 
   const nonOptionalCheckpoints = item.checkpoints.filter(
-    (c) => !("optional" in c && c.optional),
+    (c) => !('optional' in c && c.optional),
   );
-  const selectedCount = item.checkpoints.filter((c) => hasSelectedOption(selection[c.id])).length;
-  const isComplete = nonOptionalCheckpoints.every((c) => hasSelectedOption(selection[c.id]));
+  const selectedCount = item.checkpoints.filter((c) =>
+    hasSelectedOption(selection[c.id]),
+  ).length;
+  const isComplete = nonOptionalCheckpoints.every((c) =>
+    hasSelectedOption(selection[c.id]),
+  );
 
   return {
     lines,
