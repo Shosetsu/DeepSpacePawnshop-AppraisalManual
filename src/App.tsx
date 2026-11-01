@@ -202,7 +202,7 @@ export default function App() {
                   <span className="text-[11px] text-slate-600">
                     {activeItem.id === "ribwich"
                       ? "支持输入框输入与选项切换 · 赝品直接强制最低价"
-                      : "点击已选项可取消选择 · 配件支持多选"}
+                      : "点击已选项可取消选择 · 多选项目支持复选"}
                   </span>
                 </div>
 

@@ -52,6 +52,9 @@ export type RequirementCondition =
       any?: string[];
       all?: string[];
       exact?: string[];
+      noneOf?: string[];
+      only?: string[];
+      empty?: boolean;
     };
 
 export type BonusRule = {
@@ -242,4 +245,115 @@ export const ribwich: AppraisalItem = {
   ],
 };
 
-export const items: AppraisalItem[] = [tacticalGloves, ribwich];
+export const plasmaCell: AppraisalItem = {
+  id: 'plasma-cell',
+  name: '等离子燃料匣',
+  category: '动力 / 能源组件',
+  icon: '🔋',
+  tagline:
+    '高能等离子体密封储存容器，按品牌、外壳品相、额外瑕疵加固与等离子色态核定价值。',
+  basePrice: 300,
+  floorPrice: 90,
+  currency: '¢',
+  checkpoints: [
+    {
+      id: 'brand',
+      label: '品牌',
+      caption: '制造工坊或军警后勤部门标识',
+      icon: '🏷️',
+      options: [
+        { id: 'wld', label: 'WLD', delta: 0, note: '王尔德载具' },
+        { id: 'rnr', label: 'RNR', delta: 0, note: '共和国海军征用部' },
+        { id: 'zhs', label: 'ZHS', delta: 0, note: '中华船舶' },
+        { id: 'ign', label: 'IGN', delta: 0, note: '点火实验室' },
+      ],
+    },
+    {
+      id: 'condition',
+      label: '品相',
+      caption: '外壳整体损耗与使用程度',
+      icon: '◴',
+      options: [
+        { id: 'standard', label: '标准', delta: 0, note: '基准品相' },
+        { id: 'light_wear', label: '轻度磨损', delta: -45, note: '轻度表层磨损' },
+        { id: 'heavy_wear', label: '重度磨损', delta: -90, note: '重度外壳损伤' },
+      ],
+    },
+    {
+      id: 'extra',
+      label: '额外品相',
+      caption: '外壳特殊受损或改装加固情况（可多选）',
+      icon: '✦',
+      multiple: true,
+      optional: true,
+      options: [
+        { id: 'rupture', label: '破裂', delta: -150, note: '外壳开裂破损' },
+        { id: 'screws', label: '螺丝外露', delta: -30, note: '固定螺栓凸出外露' },
+        { id: 'reinforced', label: '加固', delta: 60, note: '加装外部防爆加强件' },
+        { id: 'none', label: '无额外品相', delta: 0, note: '外观完好无缺陷/加固' },
+      ],
+    },
+    {
+      id: 'color',
+      label: '等离子颜色',
+      caption: '匣内高能等离子流体的充能色态',
+      icon: '⚡',
+      options: [
+        { id: 'standard', label: '标准（深蓝）', delta: 0, note: '标准深蓝色态' },
+        { id: 'high', label: '高级（紫红）', delta: 150, note: '超能紫红色态' },
+        { id: 'low', label: '低级（其他颜色）', delta: -150, note: '杂质超标偏色态' },
+      ],
+    },
+  ],
+  bonuses: [
+    {
+      id: 'wld-set',
+      label: 'WLD套装',
+      formula: 'WLD + 任意品相 + 颜色低级或标准',
+      bonus: 60,
+      requires: {
+        brand: ['wld'],
+        condition: ['standard', 'light_wear', 'heavy_wear'],
+        color: ['low', 'standard'],
+      },
+    },
+    {
+      id: 'zhs-set',
+      label: 'ZHS套装',
+      formula: 'ZHS + 品相标准，可能有加固 + 颜色标准',
+      bonus: 120,
+      requires: {
+        brand: ['zhs'],
+        condition: ['standard'],
+        color: ['standard'],
+        extra: { only: ['reinforced'] },
+      },
+    },
+    {
+      id: 'rnr-set',
+      label: 'RNR套装',
+      formula: 'RNR + 破裂以外的任意品相皆可 + 颜色标准',
+      bonus: 120,
+      requires: {
+        brand: ['rnr'],
+        condition: ['standard', 'light_wear', 'heavy_wear'],
+        color: ['standard'],
+        extra: { noneOf: ['rupture'] },
+      },
+    },
+    {
+      id: 'ign-set',
+      label: 'IGN套装',
+      formula: 'IGN + 品相标准，无额外品相 + 颜色高级',
+      bonus: 750,
+      requires: {
+        brand: ['ign'],
+        condition: ['standard'],
+        color: ['high'],
+        extra: { empty: true },
+      },
+    },
+  ],
+};
+
+export const items: AppraisalItem[] = [tacticalGloves, ribwich, plasmaCell];

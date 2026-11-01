@@ -199,21 +199,45 @@ export function hasSelectedOption(val: unknown): boolean {
 export function isBonusMatched(rule: BonusRule, selection: Selection): boolean {
   return Object.entries(rule.requires).every(([checkpointId, condition]) => {
     const picked = selection[checkpointId];
-    if (!picked) return false;
-
-    const pickedList = Array.isArray(picked) ? picked : [picked];
-    if (pickedList.length === 0) return false;
+    const pickedList = !picked
+      ? []
+      : Array.isArray(picked)
+        ? picked
+        : [picked];
 
     if (Array.isArray(condition)) {
+      if (pickedList.length === 0) return false;
       return pickedList.some((p) => condition.includes(p));
     }
 
+    if (condition.empty) {
+      const actualPicked = pickedList.filter((id) => id !== 'none');
+      if (actualPicked.length > 0) return false;
+    }
+
+    if (condition.noneOf && condition.noneOf.length > 0) {
+      const hasForbidden = condition.noneOf.some((req) =>
+        pickedList.includes(req),
+      );
+      if (hasForbidden) return false;
+    }
+
+    if (condition.only && condition.only.length > 0) {
+      const actualPicked = pickedList.filter((id) => id !== 'none');
+      const allAllowed = actualPicked.every((req) =>
+        condition.only!.includes(req),
+      );
+      if (!allAllowed) return false;
+    }
+
     if (condition.all && condition.all.length > 0) {
+      if (pickedList.length === 0) return false;
       const hasAll = condition.all.every((req) => pickedList.includes(req));
       if (!hasAll) return false;
     }
 
     if (condition.any && condition.any.length > 0) {
+      if (pickedList.length === 0) return false;
       const hasAny = condition.any.some((req) => pickedList.includes(req));
       if (!hasAny) return false;
     }
