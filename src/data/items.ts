@@ -7,44 +7,37 @@ export type AppraisalOption = {
   label: string;
   delta: number;
   note?: string;
+  counterfeitReason?: string;
 };
 
-export enum CheckpointType {
-  Options = 'options',
-  Batch = 'batch',
-  Factory = 'factory',
-}
+export type LineItem = {
+  key: string;
+  label: string;
+  detail: string;
+  amount: number;
+};
 
-type BaseCheckpoint = {
+export type CheckpointEvaluation = {
+  // 缺省时按所选选项的 delta 通用计价
+  lines?: LineItem[];
+  counterfeitReasons?: string[];
+};
+
+export type Checkpoint = {
   id: string;
   label: string;
   caption: string;
   icon: string;
-};
-
-export type OptionsCheckpoint = BaseCheckpoint & {
-  type?: CheckpointType.Options;
   multiple?: boolean;
   optional?: boolean;
   options: AppraisalOption[];
+  compute?: (selection: Selection) => CheckpointEvaluation;
 };
 
-export type BatchCheckpoint = BaseCheckpoint & {
-  type: CheckpointType.Batch;
-};
-
-export type FactoryCheckpoint = BaseCheckpoint & {
-  type: CheckpointType.Factory;
-};
-
-export type Checkpoint =
-  | OptionsCheckpoint
-  | BatchCheckpoint
-  | FactoryCheckpoint;
-
-export type CheckpointOptions = OptionsCheckpoint;
-export type CheckpointBatch = BatchCheckpoint;
-export type CheckpointFactory = FactoryCheckpoint;
+function pickedIds(value: SelectionValue | undefined): string[] {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
 
 export type RequirementCondition =
   | string[]
@@ -176,22 +169,73 @@ export const ribwich: AppraisalItem = {
   checkpoints: [
     {
       id: 'batch',
-      type: CheckpointType.Batch,
       label: '生产批次',
-      caption: '输入生产年/月（如 425年1月、438年12月）',
+      caption: '根据包装上的生产年月，选择所属批次区间',
       icon: '📅',
+      options: [
+        {
+          id: 'first-month',
+          label: '第一批首月',
+          delta: 130,
+          note: '425年1月',
+        },
+        {
+          id: 'batch1',
+          label: '第一批（首月外）',
+          delta: 80,
+          note: '425年2月 ~ 429年12月',
+        },
+        {
+          id: 'batch2',
+          label: '第二批（末月外）',
+          delta: 0,
+          note: '432年1月 ~ 438年11月',
+        },
+        {
+          id: 'last-month',
+          label: '第二批末月',
+          delta: 50,
+          note: '438年12月',
+        },
+        {
+          id: 'off-cycle',
+          label: '其他年月',
+          delta: 0,
+          note: '非官方生产周期',
+          counterfeitReason: '生产批次不在官方两期生产窗口内，判定为赝品',
+        },
+      ],
     },
     {
       id: 'factory',
-      type: CheckpointType.Factory,
       label: '包装工厂',
-      caption: '输入两位数工厂代码（如 01、07、21 等）',
+      caption: '根据包装上的两位数工厂代码，选择对应品质',
       icon: '🏭',
+      options: [
+        {
+          id: 'high',
+          label: '高品质工厂',
+          delta: 50,
+          note: '代码 01 / 02 / 05 / 08 / 21 / 34',
+        },
+        {
+          id: 'low',
+          label: '低品质工厂',
+          delta: -50,
+          note: '代码 07 / 15 / 18 / 26 / 31',
+        },
+        {
+          id: 'other',
+          label: '其他工厂',
+          delta: 0,
+          note: '不在高/低品质名单内的代码',
+        },
+      ],
     },
     {
       id: 'ingredients',
       label: '豪华配料',
-      caption: '核验加料（可选，芝麻面包与酸黄瓜须成对出现）',
+      caption: '核验加料（可选，芝麻面包与加量酸黄瓜须成对出现）',
       icon: '🥩',
       multiple: true,
       optional: true,
@@ -205,11 +249,27 @@ export const ribwich: AppraisalItem = {
         },
         {
           id: 'pickle',
-          label: '酸黄瓜',
+          label: '加量酸黄瓜',
           delta: 0,
           note: '须与芝麻面包同时拥有',
         },
       ],
+      compute: (selection) => {
+        const picked = pickedIds(selection['ingredients']);
+        const hasSesame = picked.includes('sesame');
+        const hasPickle = picked.includes('pickle');
+        const counterfeitReasons: string[] = [];
+        if (hasSesame && !hasPickle) {
+          counterfeitReasons.push(
+            '配料仅有芝麻面包而无加量酸黄瓜，不符合原厂配方（判定为赝品）',
+          );
+        } else if (!hasSesame && hasPickle) {
+          counterfeitReasons.push(
+            '配料仅有加量酸黄瓜而无芝麻面包，不符合原厂配方（判定为赝品）',
+          );
+        }
+        return { counterfeitReasons };
+      },
     },
     {
       id: 'da_logo',
@@ -218,7 +278,13 @@ export const ribwich: AppraisalItem = {
       icon: '🛡️',
       options: [
         { id: 'valid', label: '正确标志', delta: 0, note: '官方正品防伪' },
-        { id: 'invalid', label: '无或错误标志', delta: 0, note: '强制保底' },
+        {
+          id: 'invalid',
+          label: '无或错误标志',
+          delta: 0,
+          note: '强制保底',
+          counterfeitReason: '防伪DA标识缺失或错误，判定为赝品',
+        },
       ],
     },
     {
@@ -230,6 +296,46 @@ export const ribwich: AppraisalItem = {
         { id: 'has', label: '有标识', delta: 0, note: '印有专属Ribwich徽标' },
         { id: 'none', label: '无标识', delta: 0, note: '未印专属徽标' },
       ],
+      compute: (selection) => {
+        const logo = selection['ribwich_logo'];
+        if (!logo) return {};
+        const batch = selection['batch'];
+        const line = (detail: string): LineItem => ({
+          key: 'ribwich_logo',
+          label: 'Ribwich标识',
+          detail,
+          amount: 0,
+        });
+        if (batch === 'first-month' || batch === 'batch1') {
+          if (logo === 'none') {
+            return { lines: [line('第一批无标识（核验通过）')] };
+          }
+          return {
+            lines: [line('异常有标识')],
+            counterfeitReasons: [
+              '第一批次包装不应印有Ribwich标识（判定为加贴赝品）',
+            ],
+          };
+        }
+        if (batch === 'batch2' || batch === 'last-month') {
+          if (logo === 'has') {
+            return { lines: [line('第二批印有标识（核验通过）')] };
+          }
+          return {
+            lines: [line('异常缺失标识')],
+            counterfeitReasons: [
+              '第二批次包装必须印有Ribwich标识（缺失标识为赝品）',
+            ],
+          };
+        }
+        return {
+          lines: [line(logo === 'has' ? '有标识' : '无标识')],
+          counterfeitReasons:
+            batch === 'off-cycle'
+              ? ['批次非正规，标识无法与批次对应（判定为赝品）']
+              : [],
+        };
+      },
     },
   ],
   bonuses: [
@@ -275,8 +381,18 @@ export const plasmaCell: AppraisalItem = {
       icon: '◴',
       options: [
         { id: 'standard', label: '标准', delta: 0, note: '基准品相' },
-        { id: 'light_wear', label: '轻度磨损', delta: -45, note: '轻度表层磨损' },
-        { id: 'heavy_wear', label: '重度磨损', delta: -90, note: '重度外壳损伤' },
+        {
+          id: 'light_wear',
+          label: '轻度磨损',
+          delta: -45,
+          note: '轻度表层磨损',
+        },
+        {
+          id: 'heavy_wear',
+          label: '重度磨损',
+          delta: -90,
+          note: '重度外壳损伤',
+        },
       ],
     },
     {
@@ -288,9 +404,24 @@ export const plasmaCell: AppraisalItem = {
       optional: true,
       options: [
         { id: 'rupture', label: '破裂', delta: -150, note: '外壳开裂破损' },
-        { id: 'screws', label: '螺丝外露', delta: -30, note: '固定螺栓凸出外露' },
-        { id: 'reinforced', label: '加固', delta: 60, note: '加装外部防爆加强件' },
-        { id: 'none', label: '无额外品相', delta: 0, note: '外观完好无缺陷/加固' },
+        {
+          id: 'screws',
+          label: '螺丝外露',
+          delta: -30,
+          note: '固定螺栓凸出外露',
+        },
+        {
+          id: 'reinforced',
+          label: '加固',
+          delta: 60,
+          note: '加装外部防爆加强件',
+        },
+        {
+          id: 'none',
+          label: '无额外品相',
+          delta: 0,
+          note: '外观完好无缺陷/加固',
+        },
       ],
     },
     {
@@ -299,9 +430,24 @@ export const plasmaCell: AppraisalItem = {
       caption: '匣内高能等离子流体的充能色态',
       icon: '⚡',
       options: [
-        { id: 'standard', label: '标准（深蓝）', delta: 0, note: '标准深蓝色态' },
-        { id: 'high', label: '高级（紫红）', delta: 150, note: '超能紫红色态' },
-        { id: 'low', label: '低级（其他颜色）', delta: -150, note: '杂质超标偏色态' },
+        {
+          id: 'standard',
+          label: '标准（深蓝）',
+          delta: 0,
+          note: '标准深蓝色态',
+        },
+        {
+          id: 'high',
+          label: '高级（紫红）',
+          delta: 150,
+          note: '超能紫红色态',
+        },
+        {
+          id: 'low',
+          label: '低级（其他颜色）',
+          delta: -150,
+          note: '杂质超标偏色态',
+        },
       ],
     },
   ],

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { items, CheckpointType, type Selection } from "./data/items";
+import { items, type Selection } from "./data/items";
 import { appraise, hasSelectedOption } from "./lib/appraise";
 import { Sidebar } from "./components/Sidebar";
 import { CheckpointCard } from "./components/CheckpointCard";
@@ -26,16 +26,7 @@ export default function App() {
       const current = prev[activeItem.id] ?? {};
       const next: Selection = { ...current };
 
-      if (
-        checkpoint?.type === CheckpointType.Batch ||
-        checkpoint?.type === CheckpointType.Factory
-      ) {
-        if (!optionId || optionId.trim() === "") {
-          delete next[checkpointId];
-        } else {
-          next[checkpointId] = optionId.trim();
-        }
-      } else if (checkpoint?.multiple) {
+      if (checkpoint?.multiple) {
         const currentVal = current[checkpointId];
         const currentList: string[] = Array.isArray(currentVal)
           ? currentVal
@@ -200,9 +191,7 @@ export default function App() {
                   </h2>
                   <div className="h-px flex-1 bg-gradient-to-r from-white/15 to-transparent" />
                   <span className="text-[11px] text-slate-600">
-                    {activeItem.id === "ribwich"
-                      ? "支持输入框输入与选项切换 · 赝品直接强制最低价"
-                      : "点击已选项可取消选择 · 多选项目支持复选"}
+                    点击已选项可取消选择 · 多选项目支持复选
                   </span>
                 </div>
 
